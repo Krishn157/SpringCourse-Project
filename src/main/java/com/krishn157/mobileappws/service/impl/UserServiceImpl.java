@@ -1,13 +1,17 @@
 package com.krishn157.mobileappws.service.impl;
 
-import com.krishn157.mobileappws.UserRepository;
+import java.util.ArrayList;
+
+
 import com.krishn157.mobileappws.io.entity.UserEntity;
+import com.krishn157.mobileappws.io.repositories.UserRepository;
 import com.krishn157.mobileappws.service.UserService;
 import com.krishn157.mobileappws.shared.Utils;
 import com.krishn157.mobileappws.shared.dto.UserDto;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -47,10 +51,26 @@ public class UserServiceImpl implements UserService{
 		return returnValue;
 	}
 
+    @Override
+	public UserDto getUser(String email) {
+		UserEntity userEntity = userRepository.findByEmail(email);
+
+		if (userEntity == null)
+			throw new UsernameNotFoundException(email);
+
+		UserDto returnValue = new UserDto();
+		BeanUtils.copyProperties(userEntity, returnValue);
+		return returnValue;
+	}
+
 	@Override
-	public UserDetails loadUserByUsername(String arg0) throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        if(userEntity == null) throw new UsernameNotFoundException(email);
+
+		return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
     
 }

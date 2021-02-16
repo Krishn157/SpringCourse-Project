@@ -1,4 +1,4 @@
-package com.krishn157.mobileappws;
+package com.krishn157.mobileappws.io.repositories;
 
 import com.krishn157.mobileappws.io.entity.UserEntity;
 
