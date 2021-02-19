@@ -2,6 +2,8 @@ package com.krishn157.mobileappws.controller;
 
 import com.krishn157.mobileappws.Models.Request.UserDetailsRequestModel;
 import com.krishn157.mobileappws.Models.Response.ErrorMessages;
+import com.krishn157.mobileappws.Models.Response.OperationStatusModel;
+import com.krishn157.mobileappws.Models.Response.RequestOperationStatus;
 import com.krishn157.mobileappws.Models.Response.UserRest;
 import com.krishn157.mobileappws.exceptions.UserServiceException;
 import com.krishn157.mobileappws.service.UserService;
@@ -55,13 +57,31 @@ public class UserController {
         return returnValue;
     }
 
-    @PutMapping
-    public String updateUser() {
-        return "update user was called";
+    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE })
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
+
+        UserRest returnValue = new UserRest();
+
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userDetails, userDto);
+
+        UserDto updatedUser = userService.updateUser(id, userDto);
+        BeanUtils.copyProperties(updatedUser, returnValue);
+
+        return returnValue;
     }
 
-    @DeleteMapping
-    public String deleteUser() {
-        return "delete user was called";
+    @DeleteMapping(path = "/{id}", produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+    public OperationStatusModel deleteUser(@PathVariable String id) {
+
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+
+        userService.deleteUser(id);
+
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        return returnValue;
     }
 }

@@ -2,6 +2,8 @@ package com.krishn157.mobileappws.service.impl;
 
 import java.util.ArrayList;
 
+import com.krishn157.mobileappws.Models.Response.ErrorMessages;
+import com.krishn157.mobileappws.exceptions.UserServiceException;
 import com.krishn157.mobileappws.io.entity.UserEntity;
 import com.krishn157.mobileappws.io.repositories.UserRepository;
 import com.krishn157.mobileappws.service.UserService;
@@ -84,6 +86,36 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userEntity, returnValue);
 
         return returnValue;
+    }
+
+    @Override
+    public UserDto updateUser(String userId, UserDto user) {
+
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if (userEntity == null)
+            throw new UsernameNotFoundException(userId);
+
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+
+        BeanUtils.copyProperties(updatedUserDetails, returnValue);
+
+        return returnValue;
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if (userEntity == null)
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
+        userRepository.delete(userEntity);
+
     }
 
 }
