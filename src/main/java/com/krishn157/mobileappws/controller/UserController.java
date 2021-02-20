@@ -1,5 +1,8 @@
 package com.krishn157.mobileappws.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.krishn157.mobileappws.Models.Request.UserDetailsRequestModel;
 import com.krishn157.mobileappws.Models.Response.ErrorMessages;
 import com.krishn157.mobileappws.Models.Response.OperationStatusModel;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -82,6 +86,23 @@ public class UserController {
         userService.deleteUser(id);
 
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        return returnValue;
+    }
+
+    // Get list of users
+    @GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+    public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "2") int limit) {
+        List<UserRest> returnValue = new ArrayList<>();
+
+        List<UserDto> users = userService.getUsers(page, limit);
+
+        for (UserDto userDto : users) {
+            UserRest userModel = new UserRest();
+            BeanUtils.copyProperties(userDto, userModel);
+            returnValue.add(userModel);
+        }
+
         return returnValue;
     }
 }
